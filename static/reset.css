@@ -98,3 +98,8 @@ input {
 .bp3-divider {
 	margin: 0px;
 }
+
+.bp3-navbar-group {
+	display: flex;
+	align-items: center;
+}

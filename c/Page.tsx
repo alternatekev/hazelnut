@@ -28,7 +28,7 @@ export const Page: FC<Props> = ({title, children}: Props) =>
         <Navbar.Heading>{title || 'Untitled'}</Navbar.Heading>
       </Navbar.Group>
       <Navbar.Group align="right">
-        <Button intent="primary" icon="export">Export Controller Video</Button>
+        <Button intent="primary" icon="record">Export Controller Video</Button>
       </Navbar.Group>
     </Navbar>
     <article css={css(styles.PageChildren)} id="PageChildren">

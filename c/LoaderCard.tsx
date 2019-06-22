@@ -1,8 +1,5 @@
 import { Component } from 'react'
-import { Navbar, Colors, Divider, ButtonGroup, Button } from '@blueprintjs/core'
-import ImageIcon from 'mdi-react/ImageIcon'
-import MapIcon from 'mdi-react/MapIcon'
-import VideoIcon from 'mdi-react/VideoIcon'
+import { Navbar, Colors, Divider, ButtonGroup, Button, Icon } from '@blueprintjs/core'
 
 import {css, prepareStyles} from '../s'
 
@@ -33,23 +30,25 @@ export class LoaderCard extends Component<Props> {
         <Navbar css={css(styles.LoaderCard)}>
           <Navbar.Group align="left">
             <Navbar.Heading>
-              {kind === Loaders.Image && <ImageIcon size={25} />}
-              {kind === Loaders.Map && <MapIcon size={25} />}
-              {kind === Loaders.Video && <VideoIcon size={25} />}
+              {kind === Loaders.Image && <Icon icon="camera" iconSize={30} />}
+              {kind === Loaders.Map && <Icon icon="map" iconSize={30} />}
+              {kind === Loaders.Video && <Icon icon="video" iconSize={30} />}
             </Navbar.Heading>
-            <Navbar.Heading><strong>{kind}</strong></Navbar.Heading>
+
           </Navbar.Group> 
           <Navbar.Group align="right">
-            {kind === Loaders.Video &&
+          {kind === Loaders.Video &&
+            <>
               <ButtonGroup>
                 <Button icon="fast-backward" />
                 <Button icon="stop" />
                 <Button icon="play" />
                 <Button icon="fast-forward" />
               </ButtonGroup>
-            }
-            <Divider />
-            <Button icon="import" />
+              <Divider />
+            </>
+          }
+          <Button icon="export" />
           </Navbar.Group>
         </Navbar>
 
