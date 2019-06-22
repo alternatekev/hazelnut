@@ -4,6 +4,7 @@ module.exports = (api) => {
     const presets = [
         "next/babel",
         "@zeit/next-typescript/babel",
+        "@emotion/babel-preset-css-prop"
     ];
 
     const plugins = [
