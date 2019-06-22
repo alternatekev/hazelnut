@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { Navbar, Colors, Divider, ButtonGroup, Button, Icon } from '@blueprintjs/core'
+import { Navbar, Colors, NavbarDivider, ButtonGroup, Button, Icon, Switch, Slider } from '@blueprintjs/core'
 
 import {css, prepareStyles} from '../s'
 
@@ -28,27 +28,31 @@ export class LoaderCard extends Component<Props> {
 
     return (
         <Navbar css={css(styles.LoaderCard)}>
-          <Navbar.Group align="left">
-            <Navbar.Heading>
-              {kind === Loaders.Image && <Icon icon="camera" iconSize={30} />}
-              {kind === Loaders.Map && <Icon icon="map" iconSize={30} />}
-              {kind === Loaders.Video && <Icon icon="video" iconSize={30} />}
-            </Navbar.Heading>
+          <Navbar.Group align="left" >
 
-          </Navbar.Group> 
+            {kind === Loaders.Image && <Icon icon="camera" iconSize={30} />}
+            {kind === Loaders.Map && <Icon icon="map" iconSize={30} />}
+            {kind === Loaders.Video && <Icon icon="video" iconSize={30} />}
+            <NavbarDivider />
+            <Button icon="document" />
+            <NavbarDivider />
+            <Slider labelStepSize={100} min={25} max={500} stepSize={1} value={100} />
+            <NavbarDivider />
+            {kind === Loaders.Video &&
+              <>
+                <ButtonGroup>
+                  <Button icon="fast-backward" />
+                  <Button icon="stop" />
+                  <Button icon="play" />
+                  <Button icon="fast-forward" />
+                </ButtonGroup>
+                <NavbarDivider />
+              </>
+            }
+            
+          </Navbar.Group>
           <Navbar.Group align="right">
-          {kind === Loaders.Video &&
-            <>
-              <ButtonGroup>
-                <Button icon="fast-backward" />
-                <Button icon="stop" />
-                <Button icon="play" />
-                <Button icon="fast-forward" />
-              </ButtonGroup>
-              <Divider />
-            </>
-          }
-          <Button icon="export" />
+            <Switch large />
           </Navbar.Group>
         </Navbar>
 
