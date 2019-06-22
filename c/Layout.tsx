@@ -76,10 +76,6 @@ const styles = prepareStyles({
   }
 })
 
-const GridRow = css`
-  margin-left: -20px !important;
-  margin-right: -20px !important;
-`
 
 export class Layout extends Component<Props> {
   static defaultProps: Props = {
@@ -149,6 +145,13 @@ export class Layout extends Component<Props> {
       noGutter,
       alignment,
     } = this.props
+
+
+    const GridRow = css`
+    margin-left: -${noGutter ? 10 : 20}px !important;
+    margin-right: -${noGutter ? 10 : 20}px !important;
+`
+
     if (Children.toArray(children).length > 1) {
 
       return (

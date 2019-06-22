@@ -94,3 +94,7 @@ input {
   --spacing-extra-extra-large: 50px;
   --spacing-extra-extra-extra-large: 100px;
 }
+
+.bp3-divider {
+	margin: 0px;
+}

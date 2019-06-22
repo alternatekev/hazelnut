@@ -1,5 +1,5 @@
 import {FC, ReactNode} from 'react'
-import {Navbar} from '@blueprintjs/core'
+import {Navbar, ButtonGroup, Button, Colors} from '@blueprintjs/core'
 import {css, t, prepareStyles} from '../s'
 
 interface Props {
@@ -9,24 +9,26 @@ interface Props {
 
 const styles = prepareStyles({
   Page: {
-    paddingTop: 70,
-    backgroundColor: '#999',
+    paddingTop: 50,
+    backgroundColor: Colors.LIGHT_GRAY3,
     height: '100vh',
     width: '100vw',
+    ...t.overflow_y
   },
-  PageChildren: {
-    ...t.ml2,
-    ...t.mr2
+  MainNavbar: {
+    backgroundColor: Colors.DARK_GRAY3,
+    color: Colors.WHITE
   }
 })
 
 export const Page: FC<Props> = ({title, children}: Props) => 
   <section id="Page" css={css(styles.Page)}>
-    <Navbar fixedToTop>
-      <Navbar.Group>
-        <Navbar.Heading><strong>Hazelnut</strong></Navbar.Heading>
-        <Navbar.Divider />
+    <Navbar fixedToTop css={css(styles.MainNavbar)}>
+      <Navbar.Group align="left">
         <Navbar.Heading>{title || 'Untitled'}</Navbar.Heading>
+      </Navbar.Group>
+      <Navbar.Group align="right">
+        <Button intent="primary" icon="export">Export Controller Video</Button>
       </Navbar.Group>
     </Navbar>
     <article css={css(styles.PageChildren)} id="PageChildren">

@@ -1,13 +1,13 @@
 import React from "react";
-import { Page, VideoLoader, MapLoader, ImageLoader, Layout } from '../c/'
+import { Page, LoaderCard, Loaders, Layout } from '../c/'
 
 const HelloWorld: React.FC = (props) => {
   return (
     <Page title="Video Mapper">
-      <Layout>
-        <VideoLoader />
-        <MapLoader />
-        <ImageLoader />
+      <Layout noGutter>
+        <LoaderCard kind={Loaders.Video} />
+        <LoaderCard kind={Loaders.Map} />
+        <LoaderCard kind={Loaders.Image} />
       </Layout>
     </Page>
   )
