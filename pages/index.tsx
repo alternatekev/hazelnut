@@ -1,18 +1,12 @@
 import React from "react";
-import styled from "@emotion/styled";
+import { Page } from '../c/'
 
-export const Header = styled("h1")({
-    color: "red",
-    textAlign: "left",
-    fontSize: "30px",
-});
-
-const HelloWorld: React.SFC = (props) => {
-    return (
-        <Header>
-            Hello Boo
-        </Header>
-    );
-};
+const HelloWorld: React.FC = (props) => {
+  return (
+    <Page title="Video Mapper">
+      hi
+    </Page>
+  )
+}
 
 export default HelloWorld;

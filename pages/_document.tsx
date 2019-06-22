@@ -8,8 +8,9 @@ export default class MyDocument extends Document {
                 <Head>
                     <meta name="viewport" content="initial-scale=1.0, width=device-width" key="viewport" />
                     <link rel="stylesheet" href="/static/reset.css" />
-                    <link rel="stylesheet" href="/static/bootstrap-grid.css" />
-                    <link href="https://use.fontawesome.com/releases/v5.0.2/css/all.css" rel="stylesheet"/>
+                    <link href="https://unpkg.com/normalize.css@^7.0.0" rel="stylesheet" />
+                    <link href="https://unpkg.com/@blueprintjs/icons@^3.4.0/lib/css/blueprint-icons.css" rel="stylesheet" />
+                    <link href="https://unpkg.com/@blueprintjs/core@^3.10.0/lib/css/blueprint.css" rel="stylesheet" />
                 </Head>
                 <body>
                     <Main/>

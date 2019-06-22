@@ -1,0 +1,1007 @@
+<style>
+    .LEDStrand {
+        stroke: rgb(0, 0, 0);
+        stroke-width: 2
+    }
+
+    .LED {
+
+        stroke-width: 2;
+
+    }
+
+    .LEDStart {
+        stroke: rgb(0, 255, 0);
+        stroke-width: 2;
+
+    }
+
+    .LEDEnd {
+        stroke: rgb(255, 0, 0);
+        stroke-width: 2;
+
+    }
+
+    #id_screen {
+        cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><circle cx='5' cy='5' r='5' stroke-width='2' stroke='white' fill-opacity='0'/><circle cx='5' cy='5' r='6' stroke-width='1' stroke='black' fill-opacity='0'/></svg>") 5 5, crosshair;
+    }
+
+    .newButtonActive {
+        border: 2px solid black;
+        font-weight: bold;
+        color: red;
+    }
+</style>
+
+
+
+<div id="id_screen" style="position: relative; border: 1px solid black; background-color: black;">
+    <canvas id="id_canvas" style="transform-style: preserve-3d"></canvas>
+    <img id="id_img" style="position:absolute; top:0; left:0; opacity: .5">
+    <svg id="id_svg" style="position:absolute; top:0; left:0;transform-style: preserve-3d">
+        <mask id="id_mask">
+            <rect fill="white" width="100%" height="100%" fill-opacity="1" />
+        </mask>
+        <rect id="id_maskOpacity" mask="url(#id_mask)" fill="black" width="100%" height="100%" fill-opacity="0" />
+    </svg>
+</div>
+
+<div id="id_controls" style="position: fixed; top:0;left:0;width: 100%; background-color: #ffffff; opacity: .9">
+    <fieldset style="width:100%">
+        Open Map File<input type="file" onchange="loadMap(this.files[0])">
+        <input type="button" value="Save Map File" onclick="SaveMap()">
+        Open Video File<input type="file" onchange="loadVideo(this.files[0])">
+        Open Image File<input type="file" onchange="loadImage(this.files[0])">
+    </fieldset>
+    <fieldset style="width:100%">
+        <input type="checkbox" checked="checked" onclick="if(this.checked) showVideo(); else hideVideo()">Show Video
+        <input type="checkbox" checked="checked" onclick="if(this.checked) showMap(); else hideMap()">Show Map
+        <input type="checkbox" checked="checked" onclick="if(this.checked) showImage(); else hideImage()">Show Image
+        <input type="button" value="Play Video" onclick="playVideo()">
+        <input type="button" value="Pause Video" onclick="pauseVideo()">
+        <input type="button" value="Step Video" onclick="stepVideo()">
+        Scale:<input type="range" max="10" min=".1" step=".01" value="3" oninput="setScale(this.value)"><span
+            id="id_scaleValue">3</span>
+        Time:<span id="id_time"></span>
+        Image Scale: <input type="range" max="10" min=".01" step=".001" value="1"
+            oninput="setImageScale(this.value)"><input id="id_imageScaleValue" value="0"
+            onchange="setImageScale(this.value)" style="width:5em">
+        Image Top: <input type="range" max="10000" min="-10000" step="1" value="0"
+            oninput="setImageTop(this.value)"><input id="id_imageTopValue" value="0" onchange="setImageTop(this.value)"
+            style="width:5em">px
+        Image Left: <input type="range" max="10000" min="-10000" step="1" value="0"
+            oninput="setImageLeft(this.value)"><input id="id_imageLeftValue" value="0"
+            onchange="setImageLeft(this.value)" style="width:5em">px
+    </fieldset>
+    <fieldset style="width:100%" id="mapControlls">
+        <legend>
+            LED Strand
+        </legend>
+        <table>
+            <!--- shut up i know --->
+            <tr>
+                <td>
+                    X Start
+                </td>
+                <td>
+                    Y Start
+                </td>
+                <td>
+                    X Step
+                </td>
+                <td>
+                    Y Step
+                </td>
+                <td>
+                    Num LEDs
+                </td>
+                <td>
+                    Controller Number
+                </td>
+                <td>
+                    Controller Pin
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input id="id_xStart" value="0"
+                        onchange="if(o_selectedStrand)o_selectedStrand.setXStart(this.value)" style="width:5em">
+                </td>
+                <td>
+                    <input id="id_yStart" value="0"
+                        onchange="if(o_selectedStrand)o_selectedStrand.setYStart(this.value)" style="width:5em">
+                </td>
+                <td>
+                    <input id="id_xStep" value="1" onchange="if(o_selectedStrand)o_selectedStrand.setXStep(this.value)"
+                        style="width:5em">
+                </td>
+                <td>
+                    <input id="id_yStep" value="0" onchange="if(o_selectedStrand)o_selectedStrand.setYStep(this.value)"
+                        style="width:5em">
+                </td>
+                <td>
+                    <input id="id_numLeds" value="2"
+                        onchange="if(o_selectedStrand)o_selectedStrand.setNumLEDs(this.value)" style="width:5em">
+                </td>
+                <td>
+                    <input id="id_controllerNumber" value="0"
+                        onchange="if(o_selectedStrand)o_selectedStrand.setControllerNum(this.value)" style="width:5em">
+                </td>
+                <td>
+                    <input id="id_controllerPin" value="0"
+                        onchange="if(o_selectedStrand)o_selectedStrand.setControllerPin(this.value)" style="width:5em">
+                </td>
+                <td>
+                    <input type="button" value="last" onclick="selectNextStrand()">
+                    <input type="button" value="next" onclick="selectLastStrand()">
+                    <input type="button" value="new" id="id_newButton" onclick="newStrand()">
+                    &nbsp;
+                    <b>
+                        Create Controller Video:
+                    </b>
+                    <input type="button" value="Record" id="id_recordButton"
+                        onclick="if(o_selectedStrand)recordStart(o_selectedStrand.cN)">
+                </td>
+            </tr>
+        </table>
+    </fieldset>
+</div>
+
+
+<script>
+    var e_video = document.createElement("video");
+    var e_canvas = document.getElementById("id_canvas");
+    var o_context = e_canvas.getContext("2d");
+
+    var e_svg = document.getElementById("id_svg");
+    var e_mask = document.getElementById("id_mask");
+    var e_maskOpacity = document.getElementById("id_maskOpacity");
+
+    var b_haveImage = false;
+    var e_img = document.getElementById("id_img");
+    var o_imgPos = new Vec(e_img.style.left, e_img.style.top);
+    var o_imgSize = new Vec(e_img.clientWidth, e_img.clientHeight);
+    e_img.style.visibility = "hidden";
+
+    var e_xStart = document.getElementById("id_xStart");
+    var e_yStart = document.getElementById("id_yStart");
+    var e_xStep = document.getElementById("id_xStep");
+    var e_yStep = document.getElementById("id_yStep");
+    var e_numLeds = document.getElementById("id_numLeds");
+    var e_controllerNumber = document.getElementById("id_controllerNumber");
+    var e_controllerPin = document.getElementById("id_controllerPin");
+    var e_newButton = document.getElementById("id_newButton");
+
+
+    var e_time = document.getElementById("id_time");
+    var e_scaleValue = document.getElementById("id_scaleValue");
+
+    var e_screen = document.getElementById("id_screen");
+    var e_controls = document.getElementById("id_controls");
+
+    var n_dragMinDist = 2;
+    var b_dragging = false;
+    var o_dragOffset = undefined;
+    var e_dragTarget = undefined;
+    var o_dragStart = undefined;
+
+    var n_timeStep = 1 / 30;
+
+    var b_haveVideo = false;
+    var b_haveMap = false;
+    var b_haveImage = false;
+    var b_playing = false;
+    var n_interval = undefined;
+    var n_width = 0;
+    var n_height = 0;
+    var n_scale = 3;
+
+    var a_currentFrame = [];
+
+    var a_strands = [];
+    var n_curStrand = -1;
+
+    var o_selectedStrand = undefined;
+    var b_creatingStrand = false;
+
+    t_startTime = undefined;
+
+    e_video.autoplay = false;
+    e_video.loop = true;
+    e_video.playsinline = true;
+    e_video.style.display = "block";
+    e_video.style.visibility = "hidden";
+    e_video.style.position = "absolute";
+    e_video.style.top = 0;
+
+    document.body.appendChild(e_video);
+
+    var o_mousePos = new Vec(0, 0);
+
+    window.addEventListener('mousemove', function (evt) {
+        rect = e_canvas.getBoundingClientRect();
+
+        var x = evt.clientX - rect.left;
+        var y = evt.clientY - rect.top;
+
+        var xd = e_canvas.width / e_canvas.offsetWidth;
+        var yd = e_canvas.height / e_canvas.offsetHeight;
+
+        o_mousePos.x = Math.floor(x * xd);
+        o_mousePos.y = Math.floor(y * yd);
+
+        mouseMoveLED();
+
+    }, false);
+    window.addEventListener('mouseup', function (e) { mouseUpLED(e) }, false);
+    e_svg.addEventListener('mouseup', function (e) { clickNewStrand(e) }, false);
+
+    function showVideo() {
+        e_maskOpacity.setAttribute("fill-opacity", 0);
+    }
+    function hideVideo() {
+        e_maskOpacity.setAttribute("fill-opacity", 1);
+    }
+    function showMap() {
+        e_svg.style.visibility = "visible";
+    }
+    function hideMap() {
+        e_svg.style.visibility = "hidden";
+    }
+    function showImage() {
+        e_img.style.visibility = "visible";
+    }
+    function hideImage() {
+        e_img.style.visibility = "hidden";
+    }
+    function loadMap(file) {
+        var reader = new FileReader();
+        reader.onload = function () {
+            var text = reader.result;
+            var line = "dummy";
+            var lineNumber = 0;
+            while (line.length > 0) {
+                line = listGetAt(text, lineNumber, '\n');
+                if (line.length > 0) {
+                    var x = listGetAt(line, 0, ' ');
+                    var xs = listGetAt(line, 1, ' ');
+                    var y = listGetAt(line, 2, ' ');
+                    var ys = listGetAt(line, 3, ' ');
+                    var num = listGetAt(line, 4, ' ');
+                    var pin = listGetAt(line, 5, ' ');
+                    var con = listGetAt(line, 6, ' ');
+
+                    (new Strand(x, xs, y, ys, num, con, pin)).render();
+                }
+
+                lineNumber++;
+            }
+        };
+        reader.readAsText(file);
+    }
+    function saveMap() {
+        map = "";
+        for (var i = 0; i < a_strands.length; i++) {
+            map += "\n";
+            map += a_strands[i].start.x;
+            map += " ";
+            map += a_strands[i].step.x;
+            map += " ";
+            map += a_strands[i].start.y;
+            map += " ";
+            map += a_strands[i].step.y;
+            map += " ";
+            map += a_strands[i].l;
+            map += " ";
+            map += a_strands[i].cP;
+            map += " ";
+            map += a_strands[i].cN;
+            map += " ";
+
+        }
+        var blob = new Blob([map], { type: "text/plain" });
+        download(blob, "map.ssv");
+
+    }
+
+    function setScale(v) {
+        n_scale = v;
+        e_scaleValue.innerHTML = v;
+        resize();
+    }
+
+    function loadImage(file) {
+        if (!file.type.startsWith('image/')) return;
+
+        e_img.addEventListener("load", function () {
+            window.URL.revokeObjectURL(this.src);
+            b_haveImage = true;
+
+            o_imgSize.x = e_img.clientWidth;
+            o_imgSize.y = e_img.clientHeight;
+
+            this.style.visibility = "visible";
+
+            n_imageScale = 1;
+
+            resize();
+        });
+
+        e_img.src = window.URL.createObjectURL(file);
+        e_img.crossOrigin = "";
+    }
+    function setImageScale(v) {
+        n_imageScale = v * 1;
+        document.getElementById('id_imageScaleValue').value = n_imageScale.toFixed(2);
+        resize();
+    }
+    function setImageTop(v) {
+        o_imgPos.y = v * 1;
+        document.getElementById('id_imageTopValue').value = v;
+        resize();
+    }
+    function setImageLeft(v) {
+        o_imgPos.x = v * 1;
+        document.getElementById('id_imageLeftValue').value = v;
+        resize();
+    }
+
+    function loadVideo(file) {
+        if (!file.type.startsWith('video/')) return;
+
+        e_video.addEventListener("loadeddata", function () {
+            window.URL.revokeObjectURL(this.src);
+            b_haveVideo = true;
+            b_playing = false;
+
+            n_width = e_video.clientWidth;
+            n_height = e_video.clientHeight;
+
+            //e_svg.setAttribute("viewBox", "0 0 " + n_width + " " + n_height);
+            e_svg.width = n_width;
+            e_svg.height = n_height;
+
+            e_canvas.width = n_width;
+            e_canvas.height = n_height;
+
+            stepVideo();
+            resize();
+        });
+
+        e_video.addEventListener("seeked", function () {
+            o_context.drawImage(e_video, 0, 0, n_width, n_height);
+            a_currentFrame = o_context.getImageData(0, 0, n_width, n_height);
+            e_time.innerHTML = e_video.currentTime.toFixed(2);
+
+            if (b_recording) {
+                recordFrame();
+            } else if (b_playing) {
+                window.setTimeout(stepVideo, 1);
+            }
+        });
+
+        window.addEventListener('resize', resize);
+
+        e_video.src = window.URL.createObjectURL(file);
+        e_video.crossOrigin = "";
+    }
+
+    function resize() {
+        var ih = n_height * n_scale;
+        var iw = n_width * n_scale;
+        e_canvas.style.width = iw;
+        e_canvas.style.height = ih;
+        e_svg.style.width = iw;
+        e_svg.style.height = ih;
+
+        if (b_haveImage) {
+            e_img.style.width = o_imgSize.x * n_imageScale * n_scale;
+            e_img.style.height = o_imgSize.y * n_imageScale * n_scale;
+            e_img.style.top = o_imgPos.y * n_imageScale * n_scale;
+            e_img.style.left = o_imgPos.x * n_imageScale * n_scale;
+        }
+
+        e_screen.style.marginTop = e_controls.clientHeight;
+
+        for (var i = 0; i < a_strands.length; i++) {
+            a_strands[i].render();
+        }
+    }
+
+    function playVideo() {
+        b_playing = true;
+        t_startTime = new Date();
+        stepVideo();
+    }
+    function pauseVideo() {
+        t_startTime = undefined;
+        b_playing = false;
+    }
+
+    function stepVideo() {
+        if (!b_haveVideo) return;
+
+        if (e_video.ended) e_video.currentTime = 0;
+
+        var s = n_timeStep;
+        if (t_startTime != undefined) {
+            var d = new Date();
+            s = (d - t_startTime) / 1000;
+            t_startTime = d;
+        }
+        if (e_video.duration <= e_video.currentTime + s)
+            e_video.currentTime = 0;
+        else
+            e_video.currentTime += s;
+
+
+
+
+    }
+    function pp(p) {
+        return 4 * (p.y * n_width + p.x);
+    }
+    function pc(p) {
+        var i = pp(p);
+        return [a_currentFrame.data[i], a_currentFrame.data[i + 1], a_currentFrame.data[i + 2]];
+    }
+
+
+    function newStrand() {
+        if (b_creatingStrand) return endNewStrand();
+
+        e_newButton.className = "newButtonActive";
+        b_creatingStrand = true;
+
+    }
+    function endNewStrand() {
+        if (!b_creatingStrand) return;
+
+        e_newButton.className = "";
+        b_creatingStrand = false;
+    }
+    function clickNewStrand() {
+        if (!b_creatingStrand) return;
+        e_xStep.value *= -1;
+        e_yStep.value *= -1;
+        s = new Strand(o_mousePos.x, e_xStep.value, o_mousePos.y, e_yStep.value, e_numLeds.value, e_controllerNumber.value, e_controllerPin.value);
+        s.setSelected();
+
+        endNewStrand();
+    }
+
+    var o_file;
+    var b_recording = false;
+    var n_recordingController = 0;
+    var n_filePos = 0;
+    var n_frameSize = 0;
+    var n_mspf = 0;
+    var n_frameCount = 0;
+    function recordStart(controllerNumber) {
+        var filename = "000.re";
+        var pinCount = [];
+        var maxCount = 0;
+
+        for (var i = 0; i < a_strands.length; i++) {
+            var s = a_strands[i];
+
+            if (s.cN != controllerNumber) continue;
+
+            if (!pinCount[s.cP]) pinCount[s.cP] = 0;
+            pinCount[s.cP] += s.l * 1;
+            if (pinCount[s.cP] > maxCount)
+                maxCount = pinCount[s.cP];
+        }
+
+        var fps = 30;
+        n_spf = 1 / 30;
+        n_pinCount = pinCount.length;
+        n_frameSize = maxCount * n_pinCount * 3;
+        n_frameCount = Math.floor(fps * e_video.duration);
+        n_filePos = 0;
+        var fileSize = n_frameSize * n_frameCount + 6;
+
+        o_file = new Uint8Array(fileSize);//please don't crash
+
+        var header = ste(61280);
+        header = header.concat(ste(n_frameSize), ste(fps));
+        for (var i = 0; i < header.length; i++) {
+            o_file[n_filePos++] = header[i];
+        }
+        b_recording = true;
+        n_recordingController = controllerNumber;
+
+        e_video.currentTime = 0;
+    }
+    function recordEnd() {
+        //holy shit it worked!!!
+
+        var blob = new Blob([o_file], { type: "application/octet-stream" });
+        download(blob, "0.re");
+        blob = undefined;
+        o_file = undefined;
+        b_recording = false;
+    }
+    function recordFrame() {
+        for (var i = 0; i < n_pinCount; i++)//loop over pins
+        {
+            recordFramePin(i, n_frameSize / n_pinCount);//get exactly this much data for pin, padded with 0s if neccesary
+        }
+        if (--n_frameCount > 0) {
+            e_video.currentTime += n_spf;
+        }
+        else {
+            recordEnd();
+        }
+    }
+    function recordFramePin(pin, size) {
+        for (var i = 0; i < a_strands.length; i++)//loop over LEDs
+        {
+            var s = a_strands[i];
+
+            if (s.cN != n_recordingController) continue;
+            if (s.cP != pin) continue;
+
+            var led = s.start.copy();
+            var f = led.copy();
+            for (var j = 0; j < s.l; j++) {
+
+                var c = pc(led.copy(f).floor());
+                o_file[n_filePos++] = c[0];
+                o_file[n_filePos++] = c[1];
+                o_file[n_filePos++] = c[2];
+                size -= 3;
+                led.add(s.step);
+            }
+        }
+
+        for (; size > 0; size--)//pad with zeros to size
+        {
+            o_file[n_filePos++] = 0;
+        }
+
+    }
+
+    function ste(num) {
+        num = Math.floor(num);
+        return [(num & 0x00ff), (num & 0xff00) >> 8];
+    }
+    function download(file, filename) {
+        if (window.navigator.msSaveOrOpenBlob) // IE10+
+        {
+            window.navigator.msSaveOrOpenBlob(file, filename);
+        }
+        else { // Others
+            var a = document.createElement("a"),
+                url = URL.createObjectURL(file);
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function () {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 0);
+        }
+    }
+
+
+    function Strand(x, xs, y, ys, l, con, pin) {
+        a_strands.push(this);
+        if (l < 2) l = 2;
+
+        this.start = new Vec(x, y);
+        this.step = new Vec(xs, ys);
+        this.l = Number(l);
+        this.cN = Number(con);
+        this.cP = Number(pin);
+        this.index = a_strands.length - 1;
+        this.leds = [];
+        this.line = undefined;
+        this.end = this.step.copy().scale(this.l - 1).add(this.start);
+
+
+        this.setSelected = function () {
+            var v = o_selectedStrand;
+            o_selectedStrand = this;
+            if (v !== undefined) v.render();
+
+            this.render();
+        };
+
+        this.setXStart = function (v) {
+            this.start.x = v;
+            this.setStart(this.start);
+        };
+        this.setYStart = function (v) {
+            this.start.y = v;
+            this.setStart(this.start);
+        };
+        this.setXStep = function (v) {
+            this.step.x = v;
+            this.setStep(this.step);
+        };
+        this.setYStep = function (v) {
+            this.step.y = v;
+            this.setStep(this.step);
+        };
+        this.setNumLEDs = function (v) {
+            this.setLen(v);
+        };
+        this.setControllerNum = function (v) {
+            this.cN = v;
+            this.render();
+        };
+        this.setControllerPin = function (v) {
+            this.cP = v;
+            this.render();
+        };
+
+        this.move = function (diff) {
+            this.start.add(diff);
+            this.end.add(diff);
+            //this.step.copy(this.end).scale(this.l-1).add(this.start);
+        };
+
+        this.setStart = function (pos) {
+            this.move(pos.sub(this.start));
+
+            //pos.copy(this.start);
+            //this.end.copy(this.step).sub(this.start).scale(1/(this.l-1));
+            //this.setStep(this.step);
+        };
+        this.setEnd = function (pos) {
+            //pos.copy(this.end);
+            this.setStep(pos.sub(this.start).scale(1 / (this.l - 1)));
+            //this.render();
+        };
+        this.setStep = function (st) {
+            st.copy(this.step).toFixed(2);
+            this.step.copy(this.end).scale(this.l - 1).add(this.start);
+            this.render();
+        };
+        this.setLen = function (len) {
+            if (len < 2) len = 2;
+            this.l = len;
+            this.end.copy(this.step).sub(this.start).scale(1 / (this.l - 1));
+            this.render();
+        };
+        this.render = function () {
+            var a = this.start.copy();
+            var b = a.copy().scale(n_scale);
+            var s = this.step;
+
+            if (this == o_selectedStrand) {
+                e_xStart.value = this.start.x;
+                e_yStart.value = this.start.y;
+                e_xStep.value = this.step.x;
+                e_yStep.value = this.step.y;
+                e_numLeds.value = this.l;
+                e_controllerNumber.value = this.cN;
+                e_controllerPin.value = this.cP;
+            }
+
+            if (this.index > 0 && a_strands[this.index - 1].cN == this.cN && a_strands[this.index - 1].cP == this.cP) {
+                var last = a_strands[this.index - 1];
+                if (this.line == undefined) this.line = drawLine(this.start.copy().scale(n_scale), last.end.copy().scale(n_scale), "LEDStrand");
+                this.line.setAttribute("x1", this.start.x * n_scale);
+                this.line.setAttribute("y1", this.start.y * n_scale);
+            }
+            if (this.index + 1 < a_strands.length && a_strands[this.index + 1].cN == this.cN && a_strands[this.index + 1].cP == this.cP) {
+                var next = a_strands[this.index + 1];
+                if (next.line == undefined) next.render();
+                next.line.setAttribute("x2", this.end.x * n_scale);
+                next.line.setAttribute("y2", this.end.y * n_scale);
+            }
+
+            for (var i = this.l; i < this.leds.length; i++) {
+                deleteLED(this.leds[i]);
+            }
+
+            if (this.l < this.leds.length) this.leds = this.leds.slice(0, this.l);
+
+            for (var i = 0; i < this.l; i++) {
+                a.copy(b).scale(n_scale).floor();
+                if (i >= this.leds.length) {
+
+                    if (i == 0) this.leds.push(drawLED(b, "LEDStart"));
+                    else if (i == this.l - 1) this.leds.push(drawLED(b, "LEDEnd"));
+                    else this.leds.push(drawLED(b, "LED"));
+
+                    this.leds[i].re_position = a.copy();
+                    this.leds[i].re_strand = this;
+                    this.leds[i].re_index = i;
+
+                    this.leds[i].addEventListener("mousedown", mouseDownLED);
+                }
+
+                var led = this.leds[i];
+
+                if (i == 0) {
+                    led.className.baseVal = "LEDStart";
+                } else if (i == (this.l - 1)) {
+                    led.className.baseVal = "LEDEnd";
+                } else {
+                    led.className.baseVal = "LED";
+                }
+                led.re_isFirst = i == 0;
+                led.re_isLast = i == (this.l - 1);
+                led.setAttribute("cx", b.x);
+                led.setAttribute("cy", b.y);
+                if (!led.re_isFirst && !led.re_isLast) {
+                    if (this == o_selectedStrand)
+                        led.setAttribute("stroke", "white");
+                    else
+                        led.setAttribute("stroke", "black");
+                }
+
+                led.re_transparentCircle.setAttribute("cx", b.x);
+                led.re_transparentCircle.setAttribute("cy", b.y);
+                b.copy(led.re_position);
+
+                a.add(s);
+            }
+
+        };
+
+    }
+
+
+    function mouseMoveLED() {
+        if (e_dragTarget == undefined) return;
+
+        var dp = o_mousePos.copy();
+
+        b_dragging = true;
+
+        if (e_dragTarget.re_isFirst) {
+            e_dragTarget.re_strand.setStart(dp);
+        } else if (e_dragTarget.re_isLast) {
+            e_dragTarget.re_strand.setEnd(dp);
+        } else {
+            e_dragTarget.re_strand.move(dp.sub(e_dragTarget.re_position.copy().scale(1 / n_scale)).floor());
+        }
+
+        e_dragTarget.re_strand.render();
+    }
+
+    function mouseDownLED(e) {
+        e = e || window.event;
+
+        var led = e.currentTarget;
+
+        led.re_strand.setSelected();
+
+        b_dragging = false;
+        e_dragTarget = led;
+        o_dragStart = o_mousePos.copy();
+    }
+
+
+    function mouseUpLED() {
+        b_dragging = false;
+        e_dragTarget = undefined;
+    }
+
+
+	/*
+		<circle cx="100" cy="100" r="90" />
+			sx zx 730-430
+		<circle cx="100" cy="100" r="95" stroke-width="2" stroke="white" fill-opacity="0"/>
+	*/
+    function drawLED(a, c) {
+
+
+        var l = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        l.setAttribute("cx", a.x);
+        l.setAttribute("cy", a.y);
+        l.setAttribute("r", 4);
+        l.setAttribute("fill-opacity", 0);
+        //l.setAttribute("class",c);
+        e_svg.appendChild(l);
+
+        var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute("cx", a.x);
+        c.setAttribute("cy", a.y);
+        c.setAttribute("r", 3);
+        e_mask.appendChild(c);
+
+        l.re_transparentCircle = c;
+
+        return l;
+    }
+    function deleteLED(led) {
+        e_mask.removeChild(led.re_transparentCircle);
+        e_svg.removeChild(led);
+    }
+
+    function drawLine(a, b, c) {
+        var l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        l.setAttribute("x1", a.x);
+        l.setAttribute("y1", a.y);
+        l.setAttribute("x2", b.x);
+        l.setAttribute("y2", b.y);
+        l.setAttribute("class", c);
+        e_svg.appendChild(l);
+        return l;
+    }
+    function drawDot(a, r, c) {
+        var l = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        l.setAttribute("cx", a.x);
+        l.setAttribute("cy", a.y);
+        l.setAttribute("r", r);
+        l.setAttribute("class", c);
+        e_svg.appendChild(l);
+        return l;
+    }
+
+    function rgb(r, g, b) {
+        r = Math.floor(r);
+        g = Math.floor(g);
+        b = Math.floor(b);
+        return ["rgb(", r, ",", g, ",", b, ")"].join("");
+    }
+
+
+
+
+    function Vec(x, y, z) {
+        this.set = function (x, y, z) {
+            this.x = Number(x);
+            this.y = Number(y);
+            this.z = Number(z);
+
+            if (x == undefined) this.x = 0;
+            if (y == undefined) this.y = 0;
+            if (z == undefined) this.z = 0;
+        }
+        this.set(x, y, z);
+        this.clear = function () {
+            this.x = this.y = this.z = 0;
+        };
+        this.add = function (oVec, res) {
+            var x = this.x + oVec.x;
+            var y = this.y + oVec.y;
+            var z = this.z + oVec.z;
+
+            if (res == undefined) res = this;
+
+            res.x = x;
+            res.y = y;
+            res.z = z;
+
+            return res;
+        };
+        this.sub = function (oVec, res) {
+            var x = this.x - oVec.x;
+            var y = this.y - oVec.y;
+            var z = this.z - oVec.z;
+
+            if (res == undefined) res = this;
+
+            res.x = x;
+            res.y = y;
+            res.z = z;
+
+            return res;
+        };
+        this.scale = function (s, res) {
+            var x = this.x * s;
+            var y = this.y * s;
+            var z = this.z * s;
+
+            if (res == undefined) res = this;
+
+            res.x = x;
+            res.y = y;
+            res.z = z;
+
+            return res;
+        };
+        this.unit = function (res) {
+            var s = this.len();
+            var x = this.x / s;
+            var y = this.y / s;
+            var z = this.z / s;
+
+            if (res == undefined) res = this;
+
+            res.x = x;
+            res.y = y;
+            res.z = z;
+
+            return res;
+        };
+        this.invert = function (res) {
+            var x = -this.x;
+            var y = -this.y;
+            var z = -this.z;
+
+            if (res == undefined) res = this;
+
+            res.x = x;
+            res.y = y;
+            res.z = z;
+
+            return res;
+        };
+        this.toFixed = function (n, res) {
+            var x = this.x.toFixed(n);
+            var y = this.y.toFixed(n);
+            var z = this.z.toFixed(n);
+
+            if (res == undefined) res = this;
+
+            res.x = x * 1;
+            res.y = y * 1;
+            res.z = z * 1;
+
+            return res;
+        }
+        this.floor = function (res) {
+            var x = Math.floor(this.x);
+            var y = Math.floor(this.y);
+            var z = Math.floor(this.z);
+
+            if (res == undefined) res = this;
+
+            res.x = x;
+            res.y = y;
+            res.z = z;
+
+            return res;
+        };
+        this.len = function () {
+            return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2) + Math.pow(this.z, 2));
+        };
+        this.dist = function (oVec) {
+            return Math.sqrt(Math.pow(this.x - oVec.x, 2) + Math.pow(this.y - oVec.y, 2) + Math.pow(this.z - oVec.z, 2));
+        };
+        this.equals = function (oVec) {
+            return this.x == oVec.x && this.y == oVec.y && this.z == oVec.z;
+        };
+        this.copy = function (res) {
+            if (res == undefined) res = new Vec();
+
+            res.x = this.x;
+            res.y = this.y;
+            res.z = this.z;
+
+            return res;
+        };
+
+        this.dot = function (oVec) {
+            return this.x * oVec.x + this.y * oVec.y + this.z * oVec.z;
+        };
+        this.project = function (oVec) {
+            return this.dot(oVec) / this.len();
+        }
+    }
+
+
+    function listLength(list, delim) {
+        var pos = 1;
+        for (i = 0; i >= 0; i = list.indexOf(delim, i)) {
+            li = i;
+            pos++;
+        }
+        return pos;
+    }
+    function listGetAt(list, pos, delim) {
+        var i = 0;
+        while (i >= 0 && pos > 0) {
+            i++;
+            pos--;
+            i = list.indexOf(delim, i);
+        }
+
+        var li = list.indexOf(delim, i + 1);
+        if (li < 0) li = list.length;
+
+        if (pos == 0) {
+            return list.substring(i, li);
+        }
+        return "";
+    }
+
+</script>
