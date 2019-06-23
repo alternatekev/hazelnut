@@ -1,5 +1,5 @@
 import {FC, ReactNode} from 'react'
-import {Navbar, ButtonGroup, Button, Colors} from '@blueprintjs/core'
+import {Navbar, Button, Colors} from '@blueprintjs/core'
 import {css, t, prepareStyles} from '../s'
 
 interface Props {
@@ -13,11 +13,18 @@ const styles = prepareStyles({
     backgroundColor: Colors.LIGHT_GRAY3,
     height: '100vh',
     width: '100vw',
-    ...t.overflow_y
+    ...t.overflow_y,
   },
   MainNavbar: {
-    backgroundColor: Colors.DARK_GRAY3,
-    color: Colors.WHITE
+    backgroundColor: Colors.DARK_GRAY1,
+    color: Colors.WHITE,
+    zIndex: 10
+  },
+  PageChildren: {
+    ...t.flex,
+    ...t.flex_column,
+    zIndex: 1,
+    ...t.relative,
   }
 })
 

@@ -103,3 +103,7 @@ input {
 	display: flex;
 	align-items: center;
 }
+
+.bp3-switch {
+  margin-top: 10px;
+}

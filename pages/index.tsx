@@ -1,5 +1,5 @@
 import React from "react";
-import { Page, LoaderCard, Loaders, Layout } from '../c/'
+import { Page, LoaderCard, Loaders, Layout, VideoCanvas } from '../c/'
 
 const HelloWorld: React.FC = (props) => {
   return (
@@ -9,6 +9,7 @@ const HelloWorld: React.FC = (props) => {
         <LoaderCard kind={Loaders.Map} />
         <LoaderCard kind={Loaders.Image} />
       </Layout>
+      <VideoCanvas />
     </Page>
   )
 }
