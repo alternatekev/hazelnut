@@ -1,5 +1,16 @@
 import { Component } from 'react'
-import { Navbar, Divider, Colors, NavbarDivider, ButtonGroup, Button, Icon, Switch, Slider } from '@blueprintjs/core'
+import { 
+  Navbar, 
+  InputGroup, 
+  Colors, 
+  NavbarDivider, 
+  Divider,
+  ButtonGroup, 
+  Button, 
+  Icon, 
+  Switch, 
+  Slider 
+} from '@blueprintjs/core'
 
 import {css, prepareStyles} from '../s'
 
@@ -30,6 +41,9 @@ export class LoaderCard extends Component<Props, State> {
       LoaderCard: {
         backgroundColor: enabled ? Colors.LIGHT_GRAY5 : Colors.LIGHT_GRAY1,
         color: enabled ? Colors.DARK_GRAY5 : Colors.GRAY4
+      },
+      EnabledButton: {
+        backgroundColor: !enabled ? Colors.BLUE2 : undefined
       }
     })
 
@@ -45,7 +59,8 @@ export class LoaderCard extends Component<Props, State> {
         <Navbar css={css(styles.LoaderCard)}>
           <Navbar.Group align="left" >
             <Button 
-              minimal 
+              minimal
+              css={css(styles.EnabledButton)}
               large 
               icon={icon}
             >
@@ -56,8 +71,8 @@ export class LoaderCard extends Component<Props, State> {
           </Navbar.Group>
           <Navbar.Group align="right">
             <Slider
-              labelRenderer={false}
-              labelStepSize={100}
+              labelRenderer={this.renderSliderLabels}
+              labelStepSize={150}
               min={25}
               max={500}
               stepSize={1}
@@ -81,6 +96,10 @@ export class LoaderCard extends Component<Props, State> {
         </Navbar>
 
     )
+  }
+
+  private renderSliderLabels = (value: number) => {
+    return `${value}%`
   }
 
   private toggleEnabled = () => {

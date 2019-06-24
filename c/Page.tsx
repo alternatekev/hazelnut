@@ -25,6 +25,17 @@ const styles = prepareStyles({
     ...t.flex_column,
     zIndex: 1,
     ...t.relative,
+  },
+  Branding: {
+    color: Colors.GRAY2,
+    ...t.mr0,
+    ...t.fw6
+  },
+  Divider: {
+    borderColor: Colors.DARK_GRAY4
+  },
+  Title: {
+    ...t.fw1
   }
 })
 
@@ -32,7 +43,9 @@ export const Page: FC<Props> = ({title, children}: Props) =>
   <section id="Page" css={css(styles.Page)}>
     <Navbar fixedToTop css={css(styles.MainNavbar)}>
       <Navbar.Group align="left">
-        <Navbar.Heading>{title || 'Untitled'}</Navbar.Heading>
+        <Navbar.Heading css={css(styles.Branding)}>Hazelnut</Navbar.Heading>
+        <Navbar.Divider css={css(styles.Divider)} />
+        <Navbar.Heading css={css(styles.Title)}>{title || 'Untitled'}</Navbar.Heading>
       </Navbar.Group>
       <Navbar.Group align="right">
         <Button intent="primary" icon="record">Export Controller Video</Button>
