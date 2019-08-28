@@ -1,4 +1,4 @@
-## React Project Starter Template with
+## React Project Starter Template
 * Next
 * Emotion
 * TypeScript
