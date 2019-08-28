@@ -1,11 +1,13 @@
-## TypeScript NextJS EmotionJS starter kit
+## React Project Starter Template with
+* Next
+* Emotion
+* TypeScript
+* Tachyons TS
+* Blueprint
 
-Got fed up with `create-react-app my-app --scripts-version=react-scripts-ts`. :)
 
 ```
-$ git clone git@github.com:lilybarrett/typescript-nextjs-starter.git
-$ yarn install
-$ yarn build
+$ yarn
 $ yarn dev
-// navigate to localhost:3000 to see "Hello Boo"
+// navigate to localhost:3000 to see home page
 ```
